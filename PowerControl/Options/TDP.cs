@@ -75,8 +75,34 @@ namespace PowerControl.Options
 
                         if (sd == null)
                         {
-                            CommonHelpers.Log.TraceLine("TDP.ApplyValue: GPU still not found after attempts, returning selected");
-                            return selected;
+                            CommonHelpers.Log.TraceLine("TDP.ApplyValue: GPU still not found after attempts, restarting...");
+                            var exePath = Process.GetCurrentProcess().MainModule?.FileName;
+                            if (!string.IsNullOrEmpty(exePath))
+                            {
+                                var scriptPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "restart_powercontrol.bat");
+                                System.IO.File.WriteAllText(scriptPath, $@"
+                                @echo off
+                                setlocal
+                                set EXE=""{exePath}""
+                                :waitloop
+                                tasklist /FI ""IMAGENAME eq {System.IO.Path.GetFileName(exePath)}"" | find /I ""{System.IO.Path.GetFileName(exePath)}"" >nul
+                                if not errorlevel 1 (
+                                    timeout /t 1 >nul
+                                    goto waitloop
+                                )
+                                timeout /t 3 >nul
+                                start """" %EXE%
+                                del ""%~f0""
+                                endlocal
+                                ");
+                                Process.Start(new ProcessStartInfo
+                                {
+                                    FileName = scriptPath,
+                                    UseShellExecute = true,
+                                    WindowStyle = ProcessWindowStyle.Hidden
+                                });
+                            }
+                            Environment.Exit(0);
                         }
 
                         CommonHelpers.Log.TraceLine($"TDP.ApplyValue: GPU found, applying TDP: slowTDP={slowTDP}, fastTDP={fastTDP}");

@@ -240,20 +240,18 @@ namespace PerformanceOverlay
 
             try
             {
-                notifyIcon.Text = TitleWithVersion + ". RTSS Version: " + OSD.Version;
+                string text = TitleWithVersion + ". RTSS Version: " + OSD.Version;
+                // Tronquer à 127 caractères pour éviter l'exception
+                if (text.Length > 127)
+                    text = text.Substring(0, 127);
+
+                notifyIcon.Text = text;
                 notifyIcon.Icon = WindowsDarkMode.IsDarkModeEnabled ? Resources.poll_light : Resources.poll;
             }
             catch
             {
                 notifyIcon.Text = TitleWithVersion + ". RTSS Not Available.";
                 notifyIcon.Icon = Resources.poll_red;
-                osdReset();
-                return;
-            }
-
-            if (!Settings.Default.ShowOSD)
-            {
-                osdTimer.Interval = 1000;
                 osdReset();
                 return;
             }

@@ -288,7 +288,16 @@ namespace PowerControl
         {
             try
             {
-                notifyIcon.Text = TitleWithVersion + ". RTSS Version: " + OSD.Version;
+                var watchedProfiles = profilesController?.WatchedProfiles ?? new string[0];
+                string text = TitleWithVersion + ". RTSS Version: " + OSD.Version;
+                if (watchedProfiles.Any())
+                    text += ". Profile: " + string.Join(", ", watchedProfiles);
+
+                // Tronquer à 127 caractères pour éviter l'exception
+                if (text.Length > 127)
+                    text = text.Substring(0, 127);
+
+                notifyIcon.Text = text;
                 notifyIcon.Icon = WindowsDarkMode.IsDarkModeEnabled ? Resources.traffic_light_outline_light : Resources.traffic_light_outline;
             }
             catch
@@ -296,10 +305,6 @@ namespace PowerControl
                 notifyIcon.Text = TitleWithVersion + ". RTSS Not Available.";
                 notifyIcon.Icon = Resources.traffic_light_outline_red;
             }
-
-            var watchedProfiles = profilesController?.WatchedProfiles ?? new string[0];
-            if (watchedProfiles.Any())
-                notifyIcon.Text += ". Profile: " + string.Join(", ", watchedProfiles);
 
             updateOSD();
         }
