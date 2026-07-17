@@ -12,9 +12,12 @@ namespace SteamController.Managers
             if (wasState.Equals(context.State))
                 return;
 
-            if (context.State.IsActive)
+            bool wasActive = wasState.IsActive;
+            bool isActive = context.State.IsActive;
+
+            if (isActive && !wasActive)
                 context.SelectController();
-            else
+            else if (!isActive && wasActive)
                 context.BackToDefault();
 
             wasState = context.State;

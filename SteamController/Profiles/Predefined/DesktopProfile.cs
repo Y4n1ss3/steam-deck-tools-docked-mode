@@ -5,7 +5,6 @@ namespace SteamController.Profiles.Predefined
     public sealed class DesktopProfile : Default.BackPanelShortcutsProfile
     {
         private const String Consumed = "DesktopProfileOwner";
-
         public DesktopProfile()
         {
             IsDesktop = true;
