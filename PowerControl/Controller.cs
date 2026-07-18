@@ -1,4 +1,4 @@
-﻿using CommonHelpers;
+using CommonHelpers;
 using ExternalHelpers;
 using hidapi;
 using Microsoft.Win32;
@@ -551,12 +551,16 @@ namespace PowerControl
                 };
                 System.Diagnostics.Process.Start(startInfo);
                 await SetBluetoothEnabled(true);
+                // Désactiver le touchscreen de l'écran principal quand un écran externe est connecté
+                await Task.Run(() => ExternalHelpers.TouchscreenController.SetEnabled(false));
             }
             else if (isExternalDisplayConnected == 0)
             {
                 Log.TraceLine("External display disconnected!");
                 System.Diagnostics.Process.Start(@"C:\SteamDeck32\DisplaySwitch.exe", "/internal");
                 await SetBluetoothEnabled(false);
+                // Réactiver le touchscreen de l'écran principal quand l'écran externe est déconnecté
+                await Task.Run(() => ExternalHelpers.TouchscreenController.SetEnabled(true));
             }
 
             profilesController.ApplyAutostartProfile();
