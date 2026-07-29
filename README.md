@@ -32,7 +32,6 @@ This project provides the following applications:
 ## Recent Features (Docked Mode)
 
 The following features have been recently added to improve the docked experience:
-- **Touchscreen Management:** Automatically disables the touchscreen when an external display is connected and re-enables it on disconnect.
 - **External Gamepad Support:** External gamepad passthrough is supported, along with shortcuts for OSD and profile switching via external controllers.
 - **GeForce Now Integration:** Automatic detection for GeForce Now profiles.
 - **State Checking:** Network and display states are properly checked automatically upon resuming from sleep or starting PowerControl.
