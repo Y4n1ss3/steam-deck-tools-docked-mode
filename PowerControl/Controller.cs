@@ -484,6 +484,8 @@ namespace PowerControl
             CleanupResources();
             components.Dispose();
             osdClose();
+            // Force process termination to avoid zombie processes due to background threads
+            Environment.Exit(0);
         }
 
         private void osdClose()
@@ -523,6 +525,18 @@ namespace PowerControl
             bool currentExternalDisplayState = ExternalHelpers.DisplayConfig.IsExternalConnected.GetValueOrDefault(false);
             int newState = currentExternalDisplayState ? 1 : 0;
 
+            // Always apply touchscreen state based on current display configuration
+            if (currentExternalDisplayState)
+            {
+                ExternalHelpers.TouchscreenController.Disable();
+                Log.TraceLine("Touchscreen disabled (external display connected).");
+            }
+            else
+            {
+                ExternalHelpers.TouchscreenController.Enable();
+                Log.TraceLine("Touchscreen enabled (no external display).");
+            }
+
             if (newState == isExternalDisplayConnected)
                 return;
 
@@ -543,14 +557,12 @@ namespace PowerControl
                 };
                 System.Diagnostics.Process.Start(startInfo);
                 await SetBluetoothEnabled(true);
-
             }
             else if (isExternalDisplayConnected == 0)
             {
                 Log.TraceLine("External display disconnected!");
                 System.Diagnostics.Process.Start(@"C:\SteamDeck32\DisplaySwitch.exe", "/internal");
                 await SetBluetoothEnabled(false);
-
             }
 
             profilesController.ApplyAutostartProfile();
