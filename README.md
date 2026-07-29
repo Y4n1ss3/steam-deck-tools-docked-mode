@@ -32,7 +32,15 @@ This project provides the following applications:
 ## Recent Features (Docked Mode)
 
 The following features have been recently added to improve the docked experience:
-- **External Gamepad Support:** External gamepad passthrough is supported, along with shortcuts for OSD and profile switching via external controllers.
+- **External Gamepad Support:** External gamepad passthrough is fully supported with dedicated shortcuts and desktop emulation.
+  - **Desktop Mode & Mouse Emulation**: When in Desktop Mode (and OSD is not visible), your external gamepad acts as a mouse:
+    - **Left Stick**: Move the mouse cursor.
+    - **Button A**: Left Click.
+    - **Button B**: Right Click.
+    - **Button X**: Toggle Windows on-screen touch keyboard.
+  - **OSD and Profile Switching**: 
+    - **View + Menu (Select + Start)**: Toggle the OSD (On-Screen Display).
+    - **D-Pad (while OSD is active)**: Navigate and switch profiles using D-Pad directions.
 - **GeForce Now Integration:** Automatic detection for GeForce Now profiles.
 - **State Checking:** Network and display states are properly checked automatically upon resuming from sleep or starting PowerControl.
 - **Performance Improvements:** Improved mutex acquisition for PowerControl and forced visual updates for TDP changes.
