@@ -165,7 +165,7 @@ namespace PowerControl
                     var process = Process.GetProcessById((int)foregroundProcessId);
                     if (process.ProcessName.Equals("chrome", StringComparison.OrdinalIgnoreCase))
                     {
-                        Log.TraceLine("ProfilesController: Manual Chrome detection - Foreground PID: {0}", foregroundProcessId);
+                        // Log.TraceLine("ProfilesController: Manual Chrome detection - Foreground PID: {0}", foregroundProcessId);
                         
                         if (!watchedProcesses.ContainsKey((int)foregroundProcessId))
                         {
