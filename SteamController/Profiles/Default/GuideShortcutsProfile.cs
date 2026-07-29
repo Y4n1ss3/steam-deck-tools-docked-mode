@@ -20,7 +20,6 @@ namespace SteamController.Profiles.Default
 
             EmulateScrollOnLPad(c);
             EmulateMouseOnRPad(c);
-            EmulateMouseOnRStick(c);
 
             if (c.Steam.BtnX.Pressed())
             {
@@ -62,25 +61,6 @@ namespace SteamController.Profiles.Default
                         Context.PadToWhellSensitivity * (double)Settings.Default.ScrollDirection,
                         Devices.DeltaValueMode.Delta,
                         10
-                    )
-                );
-            }
-        }
-
-        protected void EmulateMouseOnRStick(Context c)
-        {
-            if (c.Steam.RightThumbX || c.Steam.RightThumbY)
-            {
-                c.Mouse.MoveBy(
-                    c.Steam.RightThumbX.GetDeltaValue(
-                        Context.JoystickToMouseSensitivity,
-                        Devices.DeltaValueMode.AbsoluteTime,
-                        Settings.Default.DesktopJoystickDeadzone
-                    ),
-                    -c.Steam.RightThumbY.GetDeltaValue(
-                        Context.JoystickToMouseSensitivity,
-                        Devices.DeltaValueMode.AbsoluteTime,
-                        Settings.Default.DesktopJoystickDeadzone
                     )
                 );
             }
