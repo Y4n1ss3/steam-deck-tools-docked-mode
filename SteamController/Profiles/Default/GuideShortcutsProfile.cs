@@ -22,25 +22,6 @@ namespace SteamController.Profiles.Default
             EmulateMouseOnRPad(c);
             EmulateMouseOnRStick(c);
 
-            if (c.Steam.BtnA.Pressed())
-            {
-                c.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-            }
-
-            if (c.Steam.BtnB.HoldOnce(HoldForClose, ShortcutConsumed))
-            {
-                Helpers.ForegroundProcess.Store();
-
-                // close application
-                c.Keyboard.KeyPress(VirtualKeyCode.LMENU, VirtualKeyCode.F4);
-            }
-            else if (c.Steam.BtnB.HoldChain(HoldForKill, ShortcutConsumed, "KillProcess"))
-            {
-                // We want to KILL only the process that
-                // was foreground last time
-                Helpers.ForegroundProcess.Kill(true);
-            }
-
             if (c.Steam.BtnX.Pressed())
             {
                 switch (Settings.Default.KeyboardStyle)
@@ -57,62 +38,6 @@ namespace SteamController.Profiles.Default
                         }
                         break;
                 }
-            }
-
-            if (c.Steam.BtnL1.Pressed())
-            {
-                if (Process.GetProcessesByName("Magnify").Any())
-                {
-                    // close magnifier
-                    c.Keyboard.KeyPress(VirtualKeyCode.LWIN, VirtualKeyCode.ESCAPE);
-                }
-                else
-                {
-                    // enable magnifier
-                    c.Keyboard.KeyPress(VirtualKeyCode.LWIN, VirtualKeyCode.OEM_PLUS);
-                }
-            }
-
-            if (c.Steam.BtnR1.Pressed())
-            {
-                // take screenshot
-                c.Keyboard.KeyPress(VirtualKeyCode.LWIN, VirtualKeyCode.SNAPSHOT);
-            }
-
-            if (c.Steam.BtnVirtualLeftThumbUp.JustPressed() || c.Steam.BtnVirtualLeftThumbUp.HoldRepeat(ShortcutConsumed))
-            {
-                WindowsSettingsBrightnessController.Increase(5);
-            }
-
-            if (c.Steam.BtnVirtualLeftThumbDown.JustPressed() || c.Steam.BtnVirtualLeftThumbDown.HoldRepeat(ShortcutConsumed))
-            {
-                WindowsSettingsBrightnessController.Increase(-5);
-            }
-
-            if (c.Steam.BtnDpadRight.Pressed())
-            {
-                c.Keyboard.KeyPress(VirtualKeyCode.RETURN);
-            }
-
-            if (c.Steam.BtnDpadDown.Pressed())
-            {
-                c.Keyboard.KeyPress(VirtualKeyCode.TAB);
-            }
-
-            if (c.Steam.BtnDpadLeft.Pressed())
-            {
-                c.Keyboard.KeyPress(VirtualKeyCode.ESCAPE);
-            }
-
-            if (c.Steam.BtnRightStickPress.Pressed())
-            {
-                c.Keyboard.KeyPress(VirtualKeyCode.LWIN, VirtualKeyCode.VK_D);
-            }
-
-            // Additional binding for tool hotkeys (Lossless Fullscreen is nice)
-            if (c.Steam.BtnDpadUp.Pressed())
-            {
-                c.Keyboard.KeyPress(new VirtualKeyCode[] { VirtualKeyCode.LCONTROL, VirtualKeyCode.LMENU }, VirtualKeyCode.VK_U);
             }
 
             return true;
