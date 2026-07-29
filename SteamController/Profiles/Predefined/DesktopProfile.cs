@@ -38,6 +38,24 @@ namespace SteamController.Profiles.Predefined
                 return Status.Done;
             }
 
+            // Custom Desktop Shortcuts via Select (BtnMenu)
+            if (c.Steam.BtnMenu.Hold(TimeSpan.FromMilliseconds(100), Consumed))
+            {
+                if (c.Steam.BtnR1.Pressed())
+                {
+                    c.Keyboard.KeyPress(VirtualKeyCode.LMENU, VirtualKeyCode.TAB);
+                }
+                if (c.Steam.BtnOptions.Pressed())
+                {
+                    c.Keyboard.KeyPress(VirtualKeyCode.LMENU, VirtualKeyCode.F4);
+                }
+                if (c.Steam.BtnY.Pressed())
+                {
+                    c.Keyboard.KeyPress(new VirtualKeyCode[] { VirtualKeyCode.LCONTROL, VirtualKeyCode.SHIFT }, VirtualKeyCode.ESCAPE);
+                }
+                return Status.Done;
+            }
+
             if (!c.KeyboardMouseValid)
             {
                 // Failed to acquire secure context
@@ -52,9 +70,9 @@ namespace SteamController.Profiles.Predefined
             }
 
             EmulateScrollOnLPad(c);
-            EmulateScrollOnLStick(c);
+            EmulateScrollOnRStick(c);
             EmulateMouseOnRPad(c);
-            EmulateMouseOnRStick(c);
+            EmulateMouseOnLStick(c);
             EmulateDPadArrows(c);
 
             c.Keyboard[VirtualKeyCode.RETURN] = c.Steam.BtnA;
@@ -63,22 +81,41 @@ namespace SteamController.Profiles.Predefined
             return Status.Continue;
         }
 
-        private void EmulateScrollOnLStick(Context c)
+        private void EmulateMouseOnLStick(Context c)
         {
-            if (c.Steam.LeftThumbX)
+            if (c.Steam.LeftThumbX || c.Steam.LeftThumbY)
+            {
+                c.Mouse.MoveBy(
+                    c.Steam.LeftThumbX.GetDeltaValue(
+                        Context.JoystickToMouseSensitivity,
+                        Devices.DeltaValueMode.AbsoluteTime,
+                        Settings.Default.DesktopJoystickDeadzone
+                    ),
+                    -c.Steam.LeftThumbY.GetDeltaValue(
+                        Context.JoystickToMouseSensitivity,
+                        Devices.DeltaValueMode.AbsoluteTime,
+                        Settings.Default.DesktopJoystickDeadzone
+                    )
+                );
+            }
+        }
+
+        private void EmulateScrollOnRStick(Context c)
+        {
+            if (c.Steam.RightThumbX)
             {
                 c.Mouse.HorizontalScroll(
-                    c.Steam.LeftThumbX.GetDeltaValue(
+                    c.Steam.RightThumbX.GetDeltaValue(
                         Context.ThumbToWhellSensitivity,
                         Devices.DeltaValueMode.AbsoluteTime,
                         Settings.Default.DesktopJoystickDeadzone
                     )
                 );
             }
-            if (c.Steam.LeftThumbY)
+            if (c.Steam.RightThumbY)
             {
                 c.Mouse.VerticalScroll(
-                    c.Steam.LeftThumbY.GetDeltaValue(
+                    c.Steam.RightThumbY.GetDeltaValue(
                         Context.ThumbToWhellSensitivity * (double)Settings.Default.ScrollDirection,
                         Devices.DeltaValueMode.AbsoluteTime,
                         Settings.Default.DesktopJoystickDeadzone
@@ -86,6 +123,7 @@ namespace SteamController.Profiles.Predefined
                 );
             }
         }
+
 
         private void EmulateDPadArrows(Context c)
         {

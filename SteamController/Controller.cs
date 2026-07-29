@@ -176,14 +176,23 @@ namespace SteamController
 
             context.ProfileChanged += (profile) =>
             {
-#if false
-                notifyIcon.ShowBalloonTip(
-                    1000,
-                    TitleWithVersion,
-                    String.Format("Selected profile: {0}", profile.Name),
-                    ToolTipIcon.Info
-                );
-#endif
+                try
+                {
+                    new Microsoft.Toolkit.Uwp.Notifications.ToastContentBuilder()
+                        .AddText(TitleWithVersion)
+                        .AddText(String.Format("Selected profile: {0}", profile.Name))
+                        .Show();
+                }
+                catch
+                {
+                    // Fallback
+                    notifyIcon.ShowBalloonTip(
+                        1000,
+                        TitleWithVersion,
+                        String.Format("Selected profile: {0}", profile.Name),
+                        ToolTipIcon.Info
+                    );
+                }
             };
 
             SetupSteam(false);

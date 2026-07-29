@@ -475,15 +475,7 @@ namespace PowerControl
 
         private void ExitItem_Click(object? sender, EventArgs e)
         {
-            try
-            {
-                CleanupResources(); // Nettoyage des ressources
-                Environment.Exit(0); // Forcer l'arrêt du processus
-            }
-            catch (Exception ex)
-            {
-                Log.TraceLine($"Error during exit: {ex.Message}");
-            }
+            Application.Exit();
         }
 
         public void Dispose()

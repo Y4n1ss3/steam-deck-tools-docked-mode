@@ -97,8 +97,8 @@ namespace SteamController.Devices
 
             var haptic = new SDCHapticPacket2(position, style, intensityDB);
 
-            Log.TraceLine("STEAM: Haptic: position={0}, style={1}, intensity={2}",
-                position, style, intensityDB);
+            // Log.TraceLine("STEAM: Haptic: position={0}, style={1}, intensity={2}",
+            //     position, style, intensityDB);
 
             var bytes = new byte[Marshal.SizeOf<SDCHapticPacket2>()];
             var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);

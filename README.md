@@ -29,6 +29,15 @@ This project provides the following applications:
 - [Power Control](https://steam-deck-tools.ayufan.dev/power-control) - change TDP or refresh rate
 - [Steam Controller](https://steam-deck-tools.ayufan.dev/steam-controller) - use Steam Deck with Game Pass
 
+## Recent Features (Docked Mode)
+
+The following features have been recently added to improve the docked experience:
+- **Touchscreen Management:** Automatically disables the touchscreen when an external display is connected and re-enables it on disconnect.
+- **External Gamepad Support:** External gamepad passthrough is supported, along with shortcuts for OSD and profile switching via external controllers.
+- **GeForce Now Integration:** Automatic detection for GeForce Now profiles.
+- **State Checking:** Network and display states are properly checked automatically upon resuming from sleep or starting PowerControl.
+- **Performance Improvements:** Improved mutex acquisition for PowerControl and forced visual updates for TDP changes.
+
 ## Additional informations
 
 - [Controller Shortcuts](https://steam-deck-tools.ayufan.dev/shortcuts) - default shortcuts when using [Steam Controller](https://steam-deck-tools.ayufan.dev/steam-controller).

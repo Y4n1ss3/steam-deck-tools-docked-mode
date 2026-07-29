@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -50,7 +50,11 @@ namespace PowerControl
         }
 
         public void ApplyAutostartProfile() {
-            AutostartProfileSettings = new ProfileSettings("PowerControl", "Autostart");
+            if (DisplayConfig.IsExternalConnected.GetValueOrDefault(false))
+                AutostartProfileSettings = new ProfileSettings("PowerControl", "Autostart.Docked");
+            else
+                AutostartProfileSettings = new ProfileSettings("PowerControl", "Autostart");
+                
             ProfileChanged(null);
             ApplyProfile(AutostartProfileSettings);
         }
