@@ -70,6 +70,7 @@ namespace SteamController.Profiles.Predefined
             }
 
             EmulateMouseOnLStick(c);
+            EmulateScrollOnRStick(c);
 
             c.Mouse[Devices.MouseController.Button.Left] = c.Steam.BtnA;
             c.Mouse[Devices.MouseController.Button.Right] = c.Steam.BtnB;
@@ -97,6 +98,30 @@ namespace SteamController.Profiles.Predefined
                     ),
                     -c.Steam.LeftThumbY.GetDeltaValue(
                         Context.JoystickToMouseSensitivity,
+                        Devices.DeltaValueMode.AbsoluteTime,
+                        Settings.Default.DesktopJoystickDeadzone
+                    )
+                );
+            }
+        }
+
+        private void EmulateScrollOnRStick(Context c)
+        {
+            if (c.Steam.RightThumbX)
+            {
+                c.Mouse.HorizontalScroll(
+                    c.Steam.RightThumbX.GetDeltaValue(
+                        Context.ThumbToWhellSensitivity,
+                        Devices.DeltaValueMode.AbsoluteTime,
+                        Settings.Default.DesktopJoystickDeadzone
+                    )
+                );
+            }
+            if (c.Steam.RightThumbY)
+            {
+                c.Mouse.VerticalScroll(
+                    c.Steam.RightThumbY.GetDeltaValue(
+                        Context.ThumbToWhellSensitivity * (double)Settings.Default.ScrollDirection,
                         Devices.DeltaValueMode.AbsoluteTime,
                         Settings.Default.DesktopJoystickDeadzone
                     )
