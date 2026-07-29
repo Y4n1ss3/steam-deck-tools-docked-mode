@@ -2,7 +2,7 @@ using SteamController.ProfilesSettings;
 
 namespace SteamController.Profiles.Default
 {
-    public abstract class BackPanelShortcutsProfile : GuideShortcutsProfile
+    public abstract class BackPanelShortcutsProfile : ShortcutsProfile
     {
         internal abstract ProfilesSettings.BackPanelSettings BackPanelSettings { get; }
 

@@ -596,7 +596,7 @@ namespace SteamController
                     }
 
                     // --- 3. Mouse & Keyboard Emulation (Active only in Desktop Mode and when OSD is not visible) ---
-                    if (isPrimaryGamepad && isDesktop && !isOsdVisible)
+                    if (isPrimaryGamepad && isDesktop)
                     {
                         // Custom Select Modifiers for Desktop
                         if (selectPressed)

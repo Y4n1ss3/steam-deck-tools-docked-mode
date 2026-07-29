@@ -69,14 +69,18 @@ namespace SteamController.Profiles.Predefined
                 c.Steam.LizardMouse = SettingsDebug.Default.LizardMouse;
             }
 
-            EmulateScrollOnLPad(c);
-            EmulateScrollOnRStick(c);
-            EmulateMouseOnRPad(c);
             EmulateMouseOnLStick(c);
-            EmulateDPadArrows(c);
 
-            c.Keyboard[VirtualKeyCode.RETURN] = c.Steam.BtnA;
-            c.Keyboard[VirtualKeyCode.BACK] = c.Steam.BtnB;
+            c.Mouse[Devices.MouseController.Button.Left] = c.Steam.BtnA;
+            c.Mouse[Devices.MouseController.Button.Right] = c.Steam.BtnB;
+
+            if (c.Steam.BtnX.Pressed())
+            {
+                if (!ExternalHelpers.OnScreenKeyboard.Toggle())
+                {
+                    c.Keyboard.KeyPress(new VirtualKeyCode[] { VirtualKeyCode.LCONTROL, VirtualKeyCode.LWIN }, VirtualKeyCode.VK_O);
+                }
+            }
 
             return Status.Continue;
         }
@@ -98,39 +102,6 @@ namespace SteamController.Profiles.Predefined
                     )
                 );
             }
-        }
-
-        private void EmulateScrollOnRStick(Context c)
-        {
-            if (c.Steam.RightThumbX)
-            {
-                c.Mouse.HorizontalScroll(
-                    c.Steam.RightThumbX.GetDeltaValue(
-                        Context.ThumbToWhellSensitivity,
-                        Devices.DeltaValueMode.AbsoluteTime,
-                        Settings.Default.DesktopJoystickDeadzone
-                    )
-                );
-            }
-            if (c.Steam.RightThumbY)
-            {
-                c.Mouse.VerticalScroll(
-                    c.Steam.RightThumbY.GetDeltaValue(
-                        Context.ThumbToWhellSensitivity * (double)Settings.Default.ScrollDirection,
-                        Devices.DeltaValueMode.AbsoluteTime,
-                        Settings.Default.DesktopJoystickDeadzone
-                    )
-                );
-            }
-        }
-
-
-        private void EmulateDPadArrows(Context c)
-        {
-            c.Keyboard[VirtualKeyCode.LEFT] = c.Steam.BtnDpadLeft;
-            c.Keyboard[VirtualKeyCode.RIGHT] = c.Steam.BtnDpadRight;
-            c.Keyboard[VirtualKeyCode.UP] = c.Steam.BtnDpadUp;
-            c.Keyboard[VirtualKeyCode.DOWN] = c.Steam.BtnDpadDown;
         }
     }
 }
