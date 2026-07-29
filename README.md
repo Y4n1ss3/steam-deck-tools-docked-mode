@@ -45,6 +45,25 @@ The following features have been recently added to improve the docked experience
 - **State Checking:** Network and display states are properly checked automatically upon resuming from sleep or starting PowerControl.
 - **Performance Improvements:** Improved mutex acquisition for PowerControl and forced visual updates for TDP changes.
 
+## Built-in Steam Deck Controller Shortcuts (Desktop Mode)
+
+When the Desktop profile is active, the built-in Steam Deck controller provides the following shortcuts:
+- **Mouse & Scrolling**:
+  - **Right Trackpad / Right Stick**: Move the mouse cursor.
+  - **Left Trackpad**: Scroll horizontally and vertically.
+  - **R2 / Right Trackpad Click**: Left mouse click.
+  - **L2 / Left Trackpad Click**: Right mouse click.
+- **Buttons**:
+  - **A Button / D-Pad Right**: `Enter` (Return).
+  - **B Button**: Hold for 1 second to close the current app (`Alt+F4`), hold for 3 seconds to force kill the process.
+  - **X Button**: Toggle Windows on-screen keyboard.
+  - **L1**: Toggle Windows Magnifier.
+  - **R1**: Take a screenshot (`Win + PrintScreen`).
+  - **D-Pad Down**: `Tab`.
+  - **D-Pad Left**: `Escape`.
+  - **D-Pad Up**: `Ctrl + Alt + U` (Useful for tools like Lossless Scaling).
+  - **Right Stick Click**: Show Desktop (`Win + D`).
+
 ## Additional informations
 
 - [Controller Shortcuts](https://steam-deck-tools.ayufan.dev/shortcuts) - default shortcuts when using [Steam Controller](https://steam-deck-tools.ayufan.dev/steam-controller).
