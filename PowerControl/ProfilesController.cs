@@ -240,16 +240,11 @@ namespace PowerControl
                 {
                     // Check current process
                     var process = Process.GetProcessById(processId);
-                    Log.TraceLine("ProfilesController: Process name: {0}, HasExited: {1}", process.ProcessName, process.HasExited);
                     
                     string commandLine = GetCommandLine(process);
                     
                     if (!string.IsNullOrEmpty(commandLine))
                     {
-                        Log.TraceLine("ProfilesController: Chrome command line length: {0} chars", commandLine.Length);
-                        Log.TraceLine("ProfilesController: Command line: {0}", 
-                            commandLine.Length > 500 ? commandLine.Substring(0, 500) + "..." : commandLine);
-                        
                         string detectedService = DetectCloudGamingService(commandLine);
                         if (!string.IsNullOrEmpty(detectedService))
                         {
@@ -257,15 +252,9 @@ namespace PowerControl
                             return detectedService;
                         }
                     }
-                    else
-                    {
-                        Log.TraceLine("ProfilesController: Command line is NULL or empty for PID {0}", processId);
-                    }
                     
                     // Check all Chrome processes (parent and children)
-                    Log.TraceLine("ProfilesController: Checking all Chrome processes for cloud gaming URLs...");
                     var allChromeProcesses = Process.GetProcessesByName("chrome");
-                    Log.TraceLine("ProfilesController: Found {0} Chrome processes total", allChromeProcesses.Length);
                     
                     int checkedCount = 0;
                     foreach (var chromeProc in allChromeProcesses)
@@ -286,17 +275,14 @@ namespace PowerControl
                         }
                         catch (Exception ex)
                         {
-                            Log.TraceLine("ProfilesController: Error checking Chrome PID {0}: {1}", chromeProc.Id, ex.Message);
+                            // Ignore exceptions when checking other processes
                         }
                     }
-                    
-                    Log.TraceLine("ProfilesController: Checked {0}/{1} Chrome processes, no cloud gaming service found", checkedCount, allChromeProcesses.Length);
                     
                     // Alternative: Check window title as fallback
                     string windowTitle = GetWindowTitle(processId);
                     if (!string.IsNullOrEmpty(windowTitle))
                     {
-                        Log.TraceLine("ProfilesController: Window title: {0}", windowTitle);
                         string serviceFromTitle = DetectCloudGamingServiceFromTitle(windowTitle);
                         if (!string.IsNullOrEmpty(serviceFromTitle))
                         {
@@ -349,13 +335,6 @@ namespace PowerControl
                 return "Stadia";
             }
             
-            // Log what we found to help debugging
-            if (commandLine.Contains("http", StringComparison.OrdinalIgnoreCase))
-            {
-                int httpIndex = commandLine.IndexOf("http", StringComparison.OrdinalIgnoreCase);
-                string urlPart = commandLine.Substring(httpIndex, Math.Min(100, commandLine.Length - httpIndex));
-                Log.TraceLine("ProfilesController: Found URL but no match: {0}", urlPart);
-            }
             
             return string.Empty;
         }

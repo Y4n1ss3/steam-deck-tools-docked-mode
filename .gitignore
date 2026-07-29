@@ -9,3 +9,5 @@ scripts/Redist/
 SteamDeckTools_Setup*.exe
 GameProfiles/
 ControllerProfiles/
+
+build-temp/

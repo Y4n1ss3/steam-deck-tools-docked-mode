@@ -65,7 +65,29 @@ namespace SteamController.Profiles.Predefined
 
             if (TouchPadsEnabled && EmulateTouchPads)
             {
-                // Emulation methods have been removed to enforce the minimalist profile
+                // Restore manual emulation for trackpads
+                
+                // Emulate Scroll on LPad
+                if (context.Steam.LPadX)
+                {
+                    context.Mouse.HorizontalScroll(context.Steam.LPadX.GetDeltaValue(Context.PadToWhellSensitivity, Devices.DeltaValueMode.Delta, 0));
+                }
+                if (context.Steam.LPadY)
+                {
+                    context.Mouse.VerticalScroll(context.Steam.LPadY.GetDeltaValue(Context.PadToWhellSensitivity, Devices.DeltaValueMode.Delta, 0));
+                }
+
+                // Emulate Mouse on RPad
+                context.Mouse[Devices.MouseController.Button.Right] = context.Steam.BtnLPadPress;
+                context.Mouse[Devices.MouseController.Button.Left] = context.Steam.BtnRPadPress;
+
+                if (context.Steam.RPadX || context.Steam.RPadY)
+                {
+                    context.Mouse.MoveBy(
+                        context.Steam.RPadX.GetDeltaValue(Context.PadToMouseSensitivity, Devices.DeltaValueMode.Delta, 0),
+                        -context.Steam.RPadY.GetDeltaValue(Context.PadToMouseSensitivity, Devices.DeltaValueMode.Delta, 0)
+                    );
+                }
             }
             else
             {

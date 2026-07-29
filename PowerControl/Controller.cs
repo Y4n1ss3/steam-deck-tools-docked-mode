@@ -475,7 +475,8 @@ namespace PowerControl
 
         private void ExitItem_Click(object? sender, EventArgs e)
         {
-            Application.Exit();
+            if (notifyIcon != null) notifyIcon.Visible = false;
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
 
         public void Dispose()

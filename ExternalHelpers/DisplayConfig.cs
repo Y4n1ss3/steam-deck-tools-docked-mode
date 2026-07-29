@@ -9,7 +9,7 @@ namespace ExternalHelpers
         {
             get
             {
-                return GetDisplayConfigPathInfos()?.Any((path) => path.flags.HasFlag(DISPLAYCONFIG_PATH.DISPLAYCONFIG_PATH_ACTIVE) && path.targetInfo.outputTechnology.HasFlag(DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL));
+                return GetDisplayConfigPathInfos()?.Any((path) => path.flags.HasFlag(DISPLAYCONFIG_PATH.DISPLAYCONFIG_PATH_ACTIVE) && path.targetInfo.targetAvailable && path.targetInfo.outputTechnology.HasFlag(DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL));
             }
         }
 
@@ -17,7 +17,7 @@ namespace ExternalHelpers
         {
             get
             {
-                return GetDisplayConfigPathInfos()?.Any((path) => path.flags.HasFlag(DISPLAYCONFIG_PATH.DISPLAYCONFIG_PATH_ACTIVE) && 
+                return GetDisplayConfigPathInfos()?.Any((path) => path.flags.HasFlag(DISPLAYCONFIG_PATH.DISPLAYCONFIG_PATH_ACTIVE) && path.targetInfo.targetAvailable && 
                 (path.targetInfo.outputTechnology.HasFlag(DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HDMI) || 
                 path.targetInfo.outputTechnology.HasFlag(DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EXTERNAL) || 
                 path.targetInfo.outputTechnology.HasFlag(DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EXTERNAL)));
