@@ -38,8 +38,12 @@ The following features have been recently added to improve the docked experience
     - **Button A**: Left Click.
     - **Button B**: Right Click.
     - **Button X**: Toggle Windows on-screen touch keyboard.
+    - **Select + Start (View + Menu)**: Close the current application (`Alt+F4`).
+    - **Select + R1**: Switch applications (`Alt+Tab`).
+    - **Select + Y**: Open Task Manager (`Ctrl+Shift+Esc`).
   - **OSD and Profile Switching**: 
-    - **View + Menu (Select + Start)**: Toggle the OSD (On-Screen Display).
+    - **Hold Select (View) for 3s**: Toggle the OSD (On-Screen Display). A single press closes it if it's already open.
+    - **Hold Start (Menu) for 3s**: Toggle between Desktop and Controller profiles.
     - **D-Pad (while OSD is active)**: Navigate and switch profiles using D-Pad directions.
 - **GeForce Now Integration:** Automatic detection for GeForce Now profiles.
 - **State Checking:** Network and display states are properly checked automatically upon resuming from sleep or starting PowerControl.
