@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace CommonHelpers
 {
@@ -70,5 +70,18 @@ namespace CommonHelpers
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public String DesiredProfile;
+    }
+
+    public enum VibrationMode : uint
+    {
+        No = 0,
+        Yes = 1
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VibrationSetting
+    {
+        public VibrationMode Current;
+        public VibrationMode Desired;
     }
 }

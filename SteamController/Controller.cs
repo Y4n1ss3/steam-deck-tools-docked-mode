@@ -104,7 +104,11 @@ namespace SteamController
             var contextMenu = new ContextMenuStrip(components);
 
             var enabledItem = new ToolStripMenuItem("&Enabled");
-            enabledItem.Click += delegate { context.RequestEnable = !context.RequestEnable; };
+            enabledItem.Click += delegate 
+            { 
+                context.RequestEnable = !context.RequestEnable; 
+                UpdateCursorForProfile(context.CurrentProfile);
+            };
             contextMenu.Opening += delegate { enabledItem.Checked = context.RequestEnable; };
             contextMenu.Items.Add(enabledItem);
             contextMenu.Items.Add(new ToolStripSeparator());
@@ -133,6 +137,15 @@ namespace SteamController
             contextMenu.Items.Add(setupSteamItem);
             contextMenu.Items.Add(new ToolStripSeparator());
 
+            var hideCursorItem = new ToolStripMenuItem("Hide Cursor in Gamepad");
+            hideCursorItem.Click += delegate 
+            { 
+                Settings.Default.HideCursorInGamepadMode = !Settings.Default.HideCursorInGamepadMode; 
+                UpdateCursorForProfile(context.CurrentProfile);
+            };
+            contextMenu.Opening += delegate { hideCursorItem.Checked = Settings.Default.HideCursorInGamepadMode; };
+            contextMenu.Items.Add(hideCursorItem);
+
             var settingsItem = contextMenu.Items.Add("&Settings");
             settingsItem.Click += Settings_Click;
 
@@ -158,7 +171,11 @@ namespace SteamController
             contextMenu.Items.Add(new ToolStripSeparator());
 
             var exitItem = contextMenu.Items.Add("&Exit");
-            exitItem.Click += delegate { Application.Exit(); };
+            exitItem.Click += delegate 
+            { 
+                ExternalHelpers.CursorHider.Restore();
+                Application.Exit(); 
+            };
 
             notifyIcon.ContextMenuStrip = contextMenu;
 
@@ -173,9 +190,12 @@ namespace SteamController
                     context.SelectProfile(context.Profiles.First().Name, true);
             };
             context.BackToDefault();
+            UpdateCursorForProfile(context.CurrentProfile);
 
             context.ProfileChanged += (profile) =>
             {
+                UpdateCursorForProfile(profile);
+
                 try
                 {
                     new Microsoft.Toolkit.Uwp.Notifications.ToastContentBuilder()
@@ -208,11 +228,13 @@ namespace SteamController
             switch (e.Mode)
             {
                 case PowerModes.Suspend:
+                    ExternalHelpers.CursorHider.Restore();
                     context.Stop();
                     break;
 
                 case PowerModes.Resume:
                     context.Start(ControllerDelayAfterResumeMs);
+                    UpdateCursorForProfile(context.CurrentProfile);
                     break;
             }
         }
@@ -255,10 +277,36 @@ namespace SteamController
 
         public void Dispose()
         {
+            ExternalHelpers.CursorHider.Restore();
             Microsoft.Win32.SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
             notifyIcon.Visible = false;
             context.Stop();
             using (context) { }
+        }
+
+        private void UpdateCursorForProfile(Profiles.Profile? profile)
+        {
+            if (profile == null || !context.RequestEnable)
+            {
+                ExternalHelpers.CursorHider.Show();
+                return;
+            }
+
+            if (Settings.Default.HideCursorInGamepadMode)
+            {
+                if (profile.IsDesktop)
+                {
+                    ExternalHelpers.CursorHider.Show();
+                }
+                else
+                {
+                    ExternalHelpers.CursorHider.Hide();
+                }
+            }
+            else
+            {
+                ExternalHelpers.CursorHider.Show();
+            }
         }
 
         public void SetupSteam(bool always)

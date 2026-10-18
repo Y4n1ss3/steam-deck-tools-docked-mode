@@ -539,7 +539,14 @@ namespace PowerControl
                     var persistedValue = CurrentProfileSettings.GetValue(menuItem.PersistentKey ?? "");
                     if (persistedValue is null)
                     {
-                        continue;
+                        if (menuItem.PersistentKey == "Vibration")
+                        {
+                            persistedValue = "No";
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
 
                     try

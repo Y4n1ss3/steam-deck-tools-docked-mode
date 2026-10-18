@@ -57,6 +57,14 @@ namespace SteamController
             set { Set("DefaultProfile", value); }
         }
 
+        [Browsable(true)]
+        [Description("Hide mouse cursor in Gamepad mode (X360/DS4) and restore it in Desktop mode.")]
+        public bool HideCursorInGamepadMode
+        {
+            get { return Get<bool>("HideCursorInGamepadMode", true); }
+            set { Set("HideCursorInGamepadMode", value); }
+        }
+
         public enum ScrollMode : int
         {
             DownScrollUp = -1,

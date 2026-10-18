@@ -65,6 +65,12 @@ namespace SteamController.Profiles.Default
                 return true;
             }
 
+            if (c.Steam.BtnDpadUp.Pressed())
+            {
+                c.Keyboard.KeyPress(new VirtualKeyCode[] { VirtualKeyCode.LMENU }, VirtualKeyCode.RETURN);
+                return true;
+            }
+
             return false;
         }
     }

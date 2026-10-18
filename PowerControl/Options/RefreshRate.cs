@@ -11,20 +11,28 @@ namespace PowerControl.Options
             PersistentKey = "RefreshRate",
             PersistOnCreate = true,
             ApplyDelay = 1000,
-            ResetValue = () => { return DisplayResolutionController.GetRefreshRates().Max().ToString(); },
+            ResetValue = () => { return "Default"; },
             OptionsValues = delegate ()
             {
                 var refreshRates = DisplayResolutionController.GetRefreshRates();
                 if (refreshRates.Count() > 1)
-                    return refreshRates.Select(item => item.ToString()).ToArray();
+                {
+                    var options = new List<string> { "Default" };
+                    options.AddRange(refreshRates.Select(item => item.ToString()));
+                    return options.ToArray();
+                }
                 return null;
             },
             CurrentValue = delegate ()
             {
+                if (Instance.ActiveOption == "Default")
+                    return "Default";
                 return DisplayResolutionController.GetRefreshRate().ToString();
             },
             ApplyValue = (selected) =>
             {
+                if (selected == "Default") return "Default";
+
                 DisplayResolutionController.SetRefreshRate(int.Parse(selected));
 
                 return DisplayResolutionController.GetRefreshRate().ToString();

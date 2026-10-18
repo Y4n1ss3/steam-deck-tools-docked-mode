@@ -48,6 +48,7 @@ namespace SteamController
         }
 
         public bool RequestEnable { get; set; } = true;
+        public bool VibrationEnabled { get; set; } = false;
         public ContextState State;
 
         public event Action<Profiles.Profile> ProfileChanged;
@@ -259,6 +260,8 @@ namespace SteamController
         private readonly Dictionary<string, bool> lastR1States = new Dictionary<string, bool>();
         private readonly Dictionary<string, bool> lastButtonYStates = new Dictionary<string, bool>();
         private readonly Dictionary<string, bool> lastStartBtnStates = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> lastL1States = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> lastButtonBStates = new Dictionary<string, bool>();
 
         private string GetGamepadId(Windows.Gaming.Input.RawGameController raw)
         {
@@ -363,9 +366,7 @@ namespace SteamController
                         if (buttons.Length > 10) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Button.RightThumb] = buttons[10];
 
                         // 8 is Stadia, 11 is Assistant, 12 is Capture
-                        bool guidePressed = (buttons.Length > 8 && buttons[8]) || 
-                                            (buttons.Length > 11 && buttons[11]) || 
-                                            (buttons.Length > 12 && buttons[12]);
+                        bool guidePressed = (buttons.Length > 8 && buttons[8]);
                         
                         if (guidePressed)
                             targetX360.Overwrite(Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Button.Guide, true, 100);
@@ -426,8 +427,29 @@ namespace SteamController
                     if (axes.Length > 1) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Axis.LeftThumbY] = ToAxisInv(axes[1]);
                     if (axes.Length > 2) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Axis.RightThumbX] = ToAxis(axes[2]);
                     if (axes.Length > 3) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Axis.RightThumbY] = ToAxisInv(axes[3]);
-                    if (axes.Length > 4) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Slider.LeftTrigger] = ToTrigger(axes[4]);
-                    if (axes.Length > 5) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Slider.RightTrigger] = ToTrigger(axes[5]);
+                    if (axes.Length > 4) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Slider.RightTrigger] = ToTrigger(axes[4]);
+                    if (axes.Length > 5) targetX360[Nefarius.ViGEm.Client.Targets.Xbox360.Xbox360Slider.LeftTrigger] = ToTrigger(axes[5]);
+
+                    try
+                    {
+                        var wgiGamepad = Windows.Gaming.Input.Gamepad.FromGameController(raw);
+                        if (wgiGamepad != null)
+                        {
+                            if (VibrationEnabled && (targetX360.FeedbackLargeMotor.HasValue || targetX360.FeedbackSmallMotor.HasValue))
+                            {
+                                wgiGamepad.Vibration = new Windows.Gaming.Input.GamepadVibration
+                                {
+                                    LeftMotor = (targetX360.FeedbackLargeMotor ?? 0) / 255.0,
+                                    RightMotor = (targetX360.FeedbackSmallMotor ?? 0) / 255.0
+                                };
+                            }
+                            else
+                            {
+                                wgiGamepad.Vibration = new Windows.Gaming.Input.GamepadVibration { LeftMotor = 0, RightMotor = 0 };
+                            }
+                        }
+                    }
+                    catch { }
 
                     padIndex++;
                 }
@@ -595,7 +617,112 @@ namespace SteamController
                         lastDpadRightStates[gamepadId] = dpadRight;
                     }
 
-                    // --- 3. Mouse & Keyboard Emulation (Active only in Desktop Mode and when OSD is not visible) ---
+                    // --- 2.5 Global Select Modifiers (Active outside OSD) ---
+                    if (isPrimaryGamepad && selectPressed && !isOsdVisible)
+                    {
+                        var dpadState = switches.Length > 0 ? switches[0] : Windows.Gaming.Input.GameControllerSwitchPosition.Center;
+                        bool dpadUpPressed = dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.Up ||
+                                      dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.UpLeft ||
+                                      dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.UpRight;
+                        bool dpadDownPressed = dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.Down ||
+                                        dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.DownLeft ||
+                                        dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.DownRight;
+                        bool dpadLeftPressed = dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.Left ||
+                                        dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.UpLeft ||
+                                        dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.DownLeft;
+                        bool dpadRightPressed = dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.Right ||
+                                         dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.UpRight ||
+                                         dpadState == Windows.Gaming.Input.GameControllerSwitchPosition.DownRight;
+
+                        lastDpadUpStates.TryGetValue(gamepadId, out bool lastUp);
+                        if (dpadUpPressed && !lastUp)
+                        {
+                            Keyboard.KeyPress(new WindowsInput.VirtualKeyCode[] { WindowsInput.VirtualKeyCode.LMENU }, WindowsInput.VirtualKeyCode.RETURN);
+                            // Cancel the 3-second hold for OSD if a combo was used
+                            selectHoldTriggered[gamepadId] = true; 
+                        }
+                        lastDpadUpStates[gamepadId] = dpadUpPressed;
+
+                        bool startBtnPressed = buttons.Length > 7 && buttons[7];
+                        lastStartBtnStates.TryGetValue(gamepadId, out bool lastStartBtn);
+                        if (startBtnPressed && !lastStartBtn)
+                        {
+                            Keyboard.KeyPress(WindowsInput.VirtualKeyCode.LMENU, WindowsInput.VirtualKeyCode.F4);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastStartBtnStates[gamepadId] = startBtnPressed;
+
+                        lastDpadDownStates.TryGetValue(gamepadId, out bool lastDown);
+                        if (dpadDownPressed && !lastDown)
+                        {
+                            Keyboard.KeyPress(WindowsInput.VirtualKeyCode.MEDIA_PLAY_PAUSE);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastDpadDownStates[gamepadId] = dpadDownPressed;
+
+                        lastDpadLeftStates.TryGetValue(gamepadId, out bool lastLeft);
+                        if (dpadLeftPressed && !lastLeft)
+                        {
+                            Keyboard.KeyPress(WindowsInput.VirtualKeyCode.VOLUME_DOWN);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastDpadLeftStates[gamepadId] = dpadLeftPressed;
+
+                        lastDpadRightStates.TryGetValue(gamepadId, out bool lastRight);
+                        if (dpadRightPressed && !lastRight)
+                        {
+                            Keyboard.KeyPress(WindowsInput.VirtualKeyCode.VOLUME_UP);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastDpadRightStates[gamepadId] = dpadRightPressed;
+
+                        bool r1Pressed = buttons.Length > 5 && buttons[5];
+                        lastR1States.TryGetValue(gamepadId, out bool lastR1);
+                        if (r1Pressed && !lastR1)
+                        {
+                            Keyboard.KeyPress(new WindowsInput.VirtualKeyCode[] { WindowsInput.VirtualKeyCode.LMENU }, WindowsInput.VirtualKeyCode.TAB);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastR1States[gamepadId] = r1Pressed;
+
+                        bool l1Pressed = buttons.Length > 4 && buttons[4];
+                        lastL1States.TryGetValue(gamepadId, out bool lastL1);
+                        if (l1Pressed && !lastL1)
+                        {
+                            Keyboard.KeyPress(new WindowsInput.VirtualKeyCode[] { WindowsInput.VirtualKeyCode.LMENU, WindowsInput.VirtualKeyCode.SHIFT }, WindowsInput.VirtualKeyCode.TAB);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastL1States[gamepadId] = l1Pressed;
+
+                        bool yPressed = buttons.Length > 3 && buttons[3];
+                        lastButtonYStates.TryGetValue(gamepadId, out bool lastY);
+                        if (yPressed && !lastY)
+                        {
+                            Keyboard.KeyPress(new WindowsInput.VirtualKeyCode[] { WindowsInput.VirtualKeyCode.LCONTROL, WindowsInput.VirtualKeyCode.SHIFT }, WindowsInput.VirtualKeyCode.ESCAPE);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastButtonYStates[gamepadId] = yPressed;
+
+                        bool xPressed = buttons.Length > 2 && buttons[2];
+                        lastButtonXStates.TryGetValue(gamepadId, out bool lastX);
+                        if (xPressed && !lastX)
+                        {
+                            Keyboard.KeyPress(new WindowsInput.VirtualKeyCode[] { WindowsInput.VirtualKeyCode.LWIN, WindowsInput.VirtualKeyCode.LCONTROL }, WindowsInput.VirtualKeyCode.VK_O);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastButtonXStates[gamepadId] = xPressed;
+
+                        bool bPressed = buttons.Length > 1 && buttons[1];
+                        lastButtonBStates.TryGetValue(gamepadId, out bool lastB);
+                        if (bPressed && !lastB)
+                        {
+                            Keyboard.KeyPress(new WindowsInput.VirtualKeyCode[] { WindowsInput.VirtualKeyCode.LWIN }, WindowsInput.VirtualKeyCode.VK_D);
+                            selectHoldTriggered[gamepadId] = true;
+                        }
+                        lastButtonBStates[gamepadId] = bPressed;
+                    }
+
+                    // --- 3. Mouse & Keyboard Emulation (Active only in Desktop Mode) ---
                     if (isPrimaryGamepad && isDesktop)
                     {
                         // Custom Select Modifiers for Desktop

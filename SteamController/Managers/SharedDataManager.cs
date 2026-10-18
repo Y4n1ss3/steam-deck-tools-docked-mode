@@ -5,12 +5,23 @@ namespace SteamController.Managers
     public sealed class SharedDataManager : Manager
     {
         SharedData<SteamControllerSetting> sharedData = SharedData<SteamControllerSetting>.CreateNew();
+        SharedData<VibrationSetting> vibrationSharedData = SharedData<VibrationSetting>.CreateNew();
 
         public override void Tick(Context context)
         {
             if (sharedData.GetValue(out var value) && value.DesiredProfile != "")
             {
                 context.SelectProfile(value.DesiredProfile);
+            }
+
+            if (vibrationSharedData.GetValue(out var vibValue))
+            {
+                if (vibValue.Desired != vibValue.Current)
+                {
+                    vibValue.Current = vibValue.Desired;
+                    vibrationSharedData.SetValue(vibValue);
+                }
+                context.VibrationEnabled = (vibValue.Current == VibrationMode.Yes);
             }
 
             sharedData.SetValue(new SteamControllerSetting()

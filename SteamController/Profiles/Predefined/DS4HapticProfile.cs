@@ -15,6 +15,12 @@ namespace SteamController.Profiles.Predefined
             if (base.Run(context).IsDone)
                 return Status.Done;
 
+            if (!context.VibrationEnabled)
+            {
+                context.DS4.ResetFeedback();
+                return Status.Continue;
+            }
+
             if (HapticSettings.GetHapticIntensity(context.DS4.FeedbackLargeMotor, HapticSettings.LeftIntensity, out var leftIntensity))
                 context.Steam.SendHaptic(HapticPad.Right, HapticSettings.HapticStyle, leftIntensity);
 
